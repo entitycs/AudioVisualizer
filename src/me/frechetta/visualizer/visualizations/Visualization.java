@@ -16,4 +16,12 @@ public abstract class Visualization
 	
 	
 	public abstract void visualize();
+	
+	public void clear()
+	{
+		for (int i = 0; i < spectrum.length; i++)
+		{
+			spectrum[i] = 0;
+		}
+	}
 }

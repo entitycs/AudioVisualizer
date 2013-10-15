@@ -1,23 +1,23 @@
 package me.frechetta.visualizer.visualizations.bars;
 
-import me.frechetta.visualizer.AudioSpectrum;
+import me.frechetta.visualizer.AudioVisualizer;
 import me.frechetta.visualizer.visualizations.Visualization;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
-public class Bars extends Visualization
+public abstract class Bars extends Visualization
 {
 	protected Texture colors;
 	
-	protected float[] topValues = new float[2048];
-	protected float[] maxValues = new float[2048];
+	protected float[] topValues = new float[AudioVisualizer.FRAME_LENGTH];
+	protected float[] maxValues = new float[AudioVisualizer.FRAME_LENGTH];
 	
 	protected int NUM_BARS = 128;
 	protected int numSamplesPerBar = (spectrum.length / NUM_BARS);
 	
-	protected float barWidth = ((float) AudioSpectrum.WIDTH / (float) NUM_BARS);
+	protected float barWidth = ((float) AudioVisualizer.WIDTH / (float) NUM_BARS);
 	
 	protected float FALLING_SPEED = (1.0f / 3.0f);
 	
@@ -30,11 +30,7 @@ public class Bars extends Visualization
 	}
 
 	
-	@Override
-	public void visualize()
-	{
-		
-	}
+	public abstract void visualize();
 	
 	
 	public void draw(int i, int barNum)
@@ -62,7 +58,7 @@ public class Bars extends Visualization
 	
 	private float scale(float x)
 	{
-		return x / 256 * AudioSpectrum.HEIGHT * 1.5f;
+		return x / 256 * AudioVisualizer.HEIGHT * 1.5f;
 	}
 
 	
@@ -76,5 +72,17 @@ public class Bars extends Visualization
 		}
 
 		return (float) (sum / numSamplesPerBar);
+	}
+	
+	
+	@Override
+	public void clear()
+	{
+		for (int i = 0; i < AudioVisualizer.FRAME_LENGTH; i++)
+		{
+			spectrum[i] = 0;
+			topValues[i] = 0;
+			maxValues[i] = 0;
+		}
 	}
 }
