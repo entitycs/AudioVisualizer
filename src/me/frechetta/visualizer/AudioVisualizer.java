@@ -39,12 +39,14 @@ public class AudioVisualizer extends Game
 	
 	private Thread playbackThread;
 	
+	private boolean paused = true;
 	private boolean playing = false;
-	private boolean paused = false;
 	
 	private boolean opening = false;
 	
 	private boolean closing = false;
+	
+	JFileChooser fileChooser;
 
 	
 	@Override
@@ -63,6 +65,9 @@ public class AudioVisualizer extends Game
 		// create visualization
 		visualization = new Bars_BassMid(batch, spectrum);
 		
+		fileChooser = new JFileChooser();
+		fileChooser.setFileFilter(new FileNameExtensionFilter("MP3 file", "mp3"));
+		
 		openFile();
 	}
 	
@@ -76,8 +81,6 @@ public class AudioVisualizer extends Game
 			@Override
 			public void run()
 			{
-				JFileChooser fileChooser = new JFileChooser();
-				fileChooser.setFileFilter(new FileNameExtensionFilter("MP3 file", "mp3"));
 				int returnVal = fileChooser.showOpenDialog(null);
 				
 				if (returnVal == JFileChooser.APPROVE_OPTION)
@@ -93,8 +96,13 @@ public class AudioVisualizer extends Game
 	
 	public void play(String path)
 	{
-		playing = false;
 		paused = true;
+		playing = false;
+		
+		if (playbackThread != null)
+		{
+			while (playbackThread.isAlive()) {}
+		}
 		
 		FileHandle file = new FileHandle(path);
 		
@@ -134,8 +142,8 @@ public class AudioVisualizer extends Game
 			}
 		});
 		
-		playing = true;
 		paused = false;
+		playing = true;
 		playbackThread.setDaemon(true);
 		playbackThread.start();
 	}
@@ -153,9 +161,7 @@ public class AudioVisualizer extends Game
 		batch.setProjectionMatrix(camera.combined);
 
 		batch.begin();	// begin draw
-
 		visualization.visualize();	// VISUALIZE!!!
-
 		batch.end();	// end draw
 		
 		pollInput();
@@ -164,21 +170,19 @@ public class AudioVisualizer extends Game
 	
 	public void pollInput()
 	{
-		if (!opening && Gdx.input.isKeyPressed(Keys.O))
+		if (Gdx.input.isKeyPressed(Keys.O) && !opening)
 		{
 			openFile();
 		}
-		
-		if (!paused && Gdx.input.isKeyPressed(Keys.P))
+		else if (Gdx.input.isKeyPressed(Keys.P) && !paused)
 		{
 			paused = true;
 		}
-		else if (paused && Gdx.input.isKeyPressed(Keys.R))
+		else if (Gdx.input.isKeyPressed(Keys.R) && paused)
 		{
 			paused = false;
 		}
-		
-		if (!closing && Gdx.input.isKeyPressed(Keys.ESCAPE))
+		else if (Gdx.input.isKeyPressed(Keys.ESCAPE) && !closing)
 		{
 			closing = true;
 			
@@ -191,17 +195,13 @@ public class AudioVisualizer extends Game
 	public void dispose()
 	{
 		// synchronize with the thread
-		playing = false;
 		paused = true;
+		playing = false;
 		
-		// dispose of devices
-		device.dispose();
-		decoder.dispose();
-		batch.dispose();
-		fft.dispose();
+		if (playbackThread != null) while (playbackThread.isAlive()) {}
 		
-		// exit cleanly
-		System.exit(0);
+		// exit program
+		Gdx.app.exit();
 	}
 	
 	
