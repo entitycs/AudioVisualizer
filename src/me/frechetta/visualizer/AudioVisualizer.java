@@ -4,7 +4,7 @@ import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import me.frechetta.visualizer.visualizations.Visualization;
-import me.frechetta.visualizer.visualizations.bars.Bars_BassMid;
+import me.frechetta.visualizer.visualizations.grid.Grid_SrcMid_BassMid;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
@@ -63,7 +63,7 @@ public class AudioVisualizer extends Game
 		fft = new KissFFT(FRAME_LENGTH);
 		
 		// create visualization
-		visualization = new Bars_BassMid(batch, spectrum);
+		visualization = new Grid_SrcMid_BassMid(batch, spectrum);
 		
 		fileChooser = new JFileChooser();
 		fileChooser.setFileFilter(new FileNameExtensionFilter("MP3 file", "mp3"));
@@ -99,10 +99,7 @@ public class AudioVisualizer extends Game
 		paused = true;
 		playing = false;
 		
-		if (playbackThread != null)
-		{
-			while (playbackThread.isAlive()) {}
-		}
+		if (playbackThread != null) while (playbackThread.isAlive()) {}
 		
 		FileHandle file = new FileHandle(path);
 		

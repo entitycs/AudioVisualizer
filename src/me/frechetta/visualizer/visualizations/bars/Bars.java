@@ -33,7 +33,7 @@ public abstract class Bars extends Visualization
 	public abstract void visualize();
 	
 	
-	public void draw(int i, int barNum)
+	public void drawBar(int i, int barNum)
 	{
 		if (avg(barNum, numSamplesPerBar) > maxValues[barNum])
 		{
