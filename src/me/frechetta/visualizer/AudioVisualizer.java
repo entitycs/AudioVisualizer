@@ -19,12 +19,25 @@ import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
+/**
+ * AudioVisualizer is the main class for the whole system. It facilitates the complete process of the Visualizer.
+ * This process is as follows:
+ * <ul>
+ * <li>Load the mp3 file to visualize and play
+ * <li>Go through the song, decoding each frame to raw data samples
+ * <li>Write samples to AudioDevice
+ * <li>Transform samples data into spectrum data
+ * <li>Visualize spectrum data and draw visualization to screen
+ * </ul>
+ * 
+ * @author Eric
+ */
 public class AudioVisualizer extends Game
 {
 	public static final int WIDTH = 1024;
-	public static final int HEIGHT = 600;
+	public static final int HEIGHT = 800;
 	
-	public static final int FRAME_LENGTH = 2048;
+	public static final int SAMPLE_SIZE = 2048;
 	
 	private OrthographicCamera camera;
 	private SpriteBatch batch;
@@ -57,10 +70,10 @@ public class AudioVisualizer extends Game
 		camera.setToOrtho(false, WIDTH, HEIGHT);
 		batch = new SpriteBatch();
 		
-		samples = new short[FRAME_LENGTH];
-		spectrum = new float[FRAME_LENGTH];
+		samples = new short[SAMPLE_SIZE];
+		spectrum = new float[SAMPLE_SIZE];
 		
-		fft = new KissFFT(FRAME_LENGTH);
+		fft = new KissFFT(SAMPLE_SIZE);
 		
 		// create visualization
 		visualization = new Grid_SrcMid_BassMid(batch, spectrum);
@@ -72,6 +85,9 @@ public class AudioVisualizer extends Game
 	}
 	
 	
+	/**
+	 * Opens a dialog to open a file from the file system.
+	 */
 	public void openFile()
 	{
 		opening = true;
@@ -94,6 +110,13 @@ public class AudioVisualizer extends Game
 		}).start();
 	}
 	
+	/**
+	 * Creates and starts a thread for playback for the song specified by path. 
+	 * The playback thread manages decoding, writing to the audio device, and transforming 
+	 * with Fast Fourier Transform (FFT).
+	 * 
+	 * @param path
+	 */
 	public void play(String path)
 	{
 		paused = true;
@@ -165,6 +188,9 @@ public class AudioVisualizer extends Game
 	}
 	
 	
+	/**
+	 * Detects hotkey presses and performs the appropriate actions.
+	 */
 	public void pollInput()
 	{
 		if (Gdx.input.isKeyPressed(Keys.O) && !opening)

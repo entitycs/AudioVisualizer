@@ -7,12 +7,17 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
+/**
+ * Bars visualizes the spectrum data using solid bars.
+ * 
+ * @author Eric
+ */
 public abstract class Bars extends Visualization
 {
 	protected Texture colors;
 	
-	protected float[] topValues = new float[AudioVisualizer.FRAME_LENGTH];
-	protected float[] maxValues = new float[AudioVisualizer.FRAME_LENGTH];
+	protected float[] topValues = new float[AudioVisualizer.SAMPLE_SIZE];
+	protected float[] maxValues = new float[AudioVisualizer.SAMPLE_SIZE];
 	
 	protected int NUM_BARS = 128;
 	protected int numSamplesPerBar = (spectrum.length / NUM_BARS);
@@ -22,6 +27,12 @@ public abstract class Bars extends Visualization
 	protected float FALLING_SPEED = (1.0f / 3.0f);
 	
 	
+	/**
+	 * Constructor
+	 * 
+	 * @param batch
+	 * @param spectrum
+	 */
 	public Bars(SpriteBatch batch, float[] spectrum)
 	{
 		super(batch, spectrum);
@@ -30,9 +41,18 @@ public abstract class Bars extends Visualization
 	}
 
 	
+	/**
+	 * Visualizes spectrum data n the form of bars and draws it to the screen.
+	 */
 	public abstract void visualize();
 	
 	
+	/**
+	 * Draws a single bar to the screen.
+	 * 
+	 * @param i
+	 * @param barNum
+	 */
 	public void drawBar(int i, int barNum)
 	{
 		if (avg(barNum, numSamplesPerBar) > maxValues[barNum])
@@ -56,12 +76,24 @@ public abstract class Bars extends Visualization
 		topValues[barNum] -= FALLING_SPEED;
 	}
 	
+	/**
+	 * Scales a bar's value (x) to fit the screen.
+	 * 
+	 * @param x
+	 * @return scaled x
+	 */
 	private float scale(float x)
 	{
 		return x / 256 * AudioVisualizer.HEIGHT * 1.5f;
 	}
 
-	
+	/**
+	 * Computes the average sample data for a certain bar.
+	 * 
+	 * @param barNum
+	 * @param numSamplesPerBar
+	 * @return average sample data for a certain bar
+	 */
 	private float avg(int barNum, int numSamplesPerBar)
 	{
 		int sum = 0;
@@ -78,7 +110,7 @@ public abstract class Bars extends Visualization
 	@Override
 	public void clear()
 	{
-		for (int i = 0; i < AudioVisualizer.FRAME_LENGTH; i++)
+		for (int i = 0; i < AudioVisualizer.SAMPLE_SIZE; i++)
 		{
 			spectrum[i] = 0;
 			topValues[i] = 0;

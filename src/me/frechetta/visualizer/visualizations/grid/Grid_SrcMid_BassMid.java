@@ -4,9 +4,21 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 import me.frechetta.visualizer.AudioVisualizer;
 
+/**
+ * Grid_SrcMid_BassMid is a type of Grid visualization 
+ * with the source of the bars in the middle of the screen 
+ * and the bass in the middle.
+ * 
+ * @author Eric
+ */
 public class Grid_SrcMid_BassMid extends Grid
 {
-	
+	/**
+	 * Constructor
+	 * 
+	 * @param batch
+	 * @param spectrum
+	 */
 	public Grid_SrcMid_BassMid(SpriteBatch batch, float[] spectrum)
 	{
 		super(batch, spectrum);
@@ -23,17 +35,7 @@ public class Grid_SrcMid_BassMid extends Grid
 				grid[i][j] = 0;
 			}
 			
-			int barNum = 0;
-			
-			if (i < numBars / 2)
-			{
-				barNum = numBars / 2 - i;
-			}
-			else
-			{
-				barNum = i - numBars / 2;
-			}
-			
+			int barNum = getBarNum(i);
 			
 			int jSpectrumTop = ((int)scale(avg(barNum, numSamplesPerBar)) / cellSize) + (AudioVisualizer.HEIGHT / cellSize / 2 + 1);
 			int jSpectrumBot = -((int)scale(avg(barNum, numSamplesPerBar)) / cellSize) + (AudioVisualizer.HEIGHT / cellSize / 2);
@@ -48,21 +50,21 @@ public class Grid_SrcMid_BassMid extends Grid
 				grid[i][jSpectrumBot] = 2;
 			}
 			
-			while (jSpectrumTop - 4 >= (AudioVisualizer.HEIGHT / cellSize / 2 + 1))
+			while (jSpectrumTop - 5 >= (AudioVisualizer.HEIGHT / cellSize / 2 + 1))
 			{
-				if (jSpectrumTop - 4 < grid[0].length)
+				if (jSpectrumTop - 5 < grid[0].length)
 				{
-					grid[i][jSpectrumTop - 4] = 1;
+					grid[i][jSpectrumTop - 5] = 1;
 				}
 				
 				jSpectrumTop--;
 			}
 			
-			while (jSpectrumBot + 4 <= (AudioVisualizer.HEIGHT / cellSize / 2))
+			while (jSpectrumBot + 5 <= (AudioVisualizer.HEIGHT / cellSize / 2))
 			{
-				if (jSpectrumBot + 4 >= 0)
+				if (jSpectrumBot + 5 >= 0)
 				{
-					grid[i][jSpectrumBot + 4] = 1;
+					grid[i][jSpectrumBot + 5] = 1;
 				}
 				
 				jSpectrumBot++;
@@ -73,21 +75,27 @@ public class Grid_SrcMid_BassMid extends Grid
 	}
 	
 	
-	private float scale(float x)
+	/**
+	 * Gets the bar number for a specific i.
+	 * This is used when the bass of the visualization 
+	 * is not located on the left.
+	 * 
+	 * @param i
+	 * @return barNum
+	 */
+	public int getBarNum(int i)
 	{
-		return x / 256 * AudioVisualizer.HEIGHT * 1.5f;
-	}
-
-	
-	private float avg(int barNum, int numSamplesPerBar)
-	{
-		int sum = 0;
+		int barNum = 0;
 		
-		for (int i = 0; i < numSamplesPerBar; i++)
+		if (i < numBars / 2)
 		{
-			sum += spectrum[barNum + i];
+			barNum = numBars / 2 - i;
 		}
-
-		return (float) (sum / numSamplesPerBar);
+		else
+		{
+			barNum = i - numBars / 2;
+		}
+		
+		return barNum;
 	}
 }
