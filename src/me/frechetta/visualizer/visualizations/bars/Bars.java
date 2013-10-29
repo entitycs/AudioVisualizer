@@ -38,13 +38,9 @@ public abstract class Bars extends Visualization
 		super(batch, spectrum);
 		
 		colors = new Texture(new FileHandle("res/colors-borders.png"));
+		
+		displayData = new int[NUM_BARS / 4];
 	}
-
-	
-	/**
-	 * Visualizes spectrum data n the form of bars and draws it to the screen.
-	 */
-	public abstract void visualize();
 	
 	
 	/**
@@ -94,7 +90,7 @@ public abstract class Bars extends Visualization
 	 * @param numSamplesPerBar
 	 * @return average sample data for a certain bar
 	 */
-	private float avg(int barNum, int numSamplesPerBar)
+	protected float avg(int barNum, int numSamplesPerBar)
 	{
 		int sum = 0;
 		

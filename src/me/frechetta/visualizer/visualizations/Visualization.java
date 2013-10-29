@@ -1,5 +1,6 @@
 package me.frechetta.visualizer.visualizations;
 
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 /**
@@ -11,6 +12,7 @@ public abstract class Visualization
 {
 	protected SpriteBatch batch;
 	protected float[] spectrum;
+	protected int[] displayData;
 	
 	
 	/**
@@ -30,6 +32,12 @@ public abstract class Visualization
 	 * Visualizes spectrum data and draws it to the screen.
 	 */
 	public abstract void visualize();
+	
+	
+	/**
+	 * Draws the numerical spectrum data to the screen
+	 */
+	public abstract void drawData(BitmapFont font);
 	
 	
 	/**

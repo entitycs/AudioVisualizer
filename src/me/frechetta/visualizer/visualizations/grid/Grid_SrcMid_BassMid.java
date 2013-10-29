@@ -1,8 +1,9 @@
 package me.frechetta.visualizer.visualizations.grid;
 
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-
 import me.frechetta.visualizer.AudioVisualizer;
+
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 /**
  * Grid_SrcMid_BassMid is a type of Grid visualization 
@@ -25,9 +26,10 @@ public class Grid_SrcMid_BassMid extends Grid
 	}
 	
 	
-	@Override
 	public void visualize()
 	{
+		float sum = 0;
+		
 		for (int i = 0; i < numBars; i++)
 		{
 			for (int j = 0; j < grid[0].length; j++)
@@ -37,8 +39,10 @@ public class Grid_SrcMid_BassMid extends Grid
 			
 			int barNum = getBarNum(i);
 			
-			int jSpectrumTop = ((int)scale(avg(barNum, numSamplesPerBar)) / cellSize) + (AudioVisualizer.HEIGHT / cellSize / 2 + 1);
-			int jSpectrumBot = -((int)scale(avg(barNum, numSamplesPerBar)) / cellSize) + (AudioVisualizer.HEIGHT / cellSize / 2);
+			float avg = avg(barNum, numSamplesPerBar);
+			
+			int jSpectrumTop = ((int)scale(avg) / cellSize) + (AudioVisualizer.HEIGHT / cellSize / 2 + 1);
+			int jSpectrumBot = -((int)scale(avg) / cellSize) + (AudioVisualizer.HEIGHT / cellSize / 2);
 			
 			if (jSpectrumTop < grid[0].length)
 			{
@@ -69,6 +73,15 @@ public class Grid_SrcMid_BassMid extends Grid
 				
 				jSpectrumBot++;
 			}
+			
+			
+			sum += avg;
+			
+			if (i % (8 - 1) == 0)
+			{
+				displayData[i / 8] = (int)(sum / 8);
+				sum = 0;
+			}
 		}
 		
 		draw();
@@ -97,5 +110,17 @@ public class Grid_SrcMid_BassMid extends Grid
 		}
 		
 		return barNum;
+	}
+	
+	
+	public void drawData(BitmapFont font)
+	{
+		for (int i = 0; i < displayData.length; i++)
+		{
+			String data = Integer.toString(displayData[i]);
+			int x = cellSize * 8 * i + cellSize * 8 / 2 - (int)(font.getBounds(data).width / 2);
+			
+			font.draw(batch, data, x, AudioVisualizer.HEIGHT / 2);
+		}
 	}
 }

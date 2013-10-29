@@ -55,11 +55,9 @@ public abstract class Grid extends Visualization
 		scheme = lighterblueish;
 		//scheme = schemes[rand.nextInt(schemes.length)].copy();
 		//newScheme = schemes[rand.nextInt(schemes.length)].copy();
+		
+		displayData = new int[numBars / 8];
 	}
-
-	
-	@Override
-	public abstract void visualize();
 	
 	
 	/**

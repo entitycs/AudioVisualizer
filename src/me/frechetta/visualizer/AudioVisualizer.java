@@ -1,10 +1,17 @@
 package me.frechetta.visualizer;
 
+import java.io.File;
+
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import me.frechetta.visualizer.visualizations.Visualization;
+import me.frechetta.visualizer.visualizations.bars.Bars_SrcBot_BassLeft;
+import me.frechetta.visualizer.visualizations.bars.Bars_SrcBot_BassMid;
 import me.frechetta.visualizer.visualizations.grid.Grid_SrcMid_BassMid;
+
+import org.farng.mp3.AbstractMP3Tag;
+import org.farng.mp3.MP3File;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
@@ -17,6 +24,7 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
 /**
@@ -59,7 +67,19 @@ public class AudioVisualizer extends Game
 	
 	private boolean closing = false;
 	
+	private boolean data = false;
+	
 	JFileChooser fileChooser;
+	
+	BitmapFont font;
+	
+	String songName = "";
+	String songArtist = "";
+	
+	int songNameX;
+	int songNameY;
+	int songArtistX;
+	int songArtistY;
 
 	
 	@Override
@@ -80,6 +100,8 @@ public class AudioVisualizer extends Game
 		
 		fileChooser = new JFileChooser();
 		fileChooser.setFileFilter(new FileNameExtensionFilter("MP3 file", "mp3"));
+		
+		font = new BitmapFont();
 		
 		openFile();
 	}
@@ -102,6 +124,53 @@ public class AudioVisualizer extends Game
 				if (returnVal == JFileChooser.APPROVE_OPTION)
 				{
 					String path = fileChooser.getSelectedFile().getAbsolutePath();
+					
+					try
+					{
+						MP3File song = new MP3File(new File(path));
+						
+						AbstractMP3Tag tag = song.getID3v2Tag();
+						
+						/*if (song.hasFilenameTag())
+						{
+							tag = FilenameTagBuilder.createFilenameTagFromMP3File(song);
+						}
+						else if (song.hasID3v1Tag())
+						{
+							tag = song.getID3v1Tag();
+						}
+						else if (song.hasID3v2Tag())
+						{
+							tag = song.getID3v2Tag();
+						}*/
+												
+						songName = tag.getSongTitle();
+						songArtist = tag.getLeadArtist();
+						
+					}
+					catch (Exception e)
+					{
+						e.printStackTrace();
+					}
+					
+					if (songName.equals(""))
+					{
+						songName = "Unknown title";
+					}
+					
+					if (songArtist.equals(""))
+					{
+						songArtist = "Unknown artist";
+					}
+					
+					songName = "Title: " + songName;
+					songArtist = "Artist: " + songArtist;
+					
+					songNameX = WIDTH - 20 - (int)font.getBounds(songName).width;
+					songNameY = HEIGHT - 20 - (int)font.getBounds(songName).height;
+					songArtistX = WIDTH - 20 - (int)font.getBounds(songArtist).width;
+					songArtistY = songNameY - 20 - (int)font.getBounds(songArtist).height;
+					
 					play(path);
 				}
 				
@@ -180,8 +249,16 @@ public class AudioVisualizer extends Game
 		camera.update();
 		batch.setProjectionMatrix(camera.combined);
 
-		batch.begin();	// begin draw
+		batch.begin();	// begin draw		
 		visualization.visualize();	// VISUALIZE!!!
+		font.draw(batch, songName, songNameX, songNameY);
+		font.draw(batch, songArtist, songArtistX, songArtistY);
+		
+		if (data)
+		{
+			visualization.drawData(font);
+		}
+		
 		batch.end();	// end draw
 		
 		pollInput();
@@ -210,6 +287,14 @@ public class AudioVisualizer extends Game
 			closing = true;
 			
 			dispose();
+		}
+		else if (Gdx.input.isKeyPressed(Keys.D) && !data)
+		{
+			data = true;
+		}
+		else if (Gdx.input.isKeyPressed(Keys.F) && data)
+		{
+			data = false;
 		}
 	}
 
